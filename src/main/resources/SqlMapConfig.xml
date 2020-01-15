@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE configuration
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+  <!--
+    configuration的Properties variabless属性
+  -->
+  <properties resource="jdbc.properties">
+    <property name="jdbc.driver" value="com.mysql.jdbc.Driver"/>
+  </properties>
+
+  <!--
+    configuration里面的属性，最终是通过configration的set方法赋值
+  -->
+  <settings>
+    <setting name="mapUnderscoreToCamelCase" value="true"/>
+    <setting name="useGeneratedKeys" value="true"/>
+    <!--<setting name="autoMappingBehavior" value="FULL"/>-->
+  </settings>
+
+  <!--
+    configuration->typeAliasRegister->typeAliases
+    configuration的构造方法和typeAliasRegister的构造方法里面都有相应的别名注册
+  -->
+  <typeAliases>
+    <!--<typeAlias type="com.itheima.domain.User" alias="asd"/>-->
+    <package name="com.itheima.domain"/>
+  </typeAliases>
+
+  <!--配置连接数据库的环境 default:指定使用哪一个环境-->
+  <environments default="development">
+    <environment id="development">
+      <!--配置事务,MyBatis事务用的是jdbc  connection.commit()-->
+      <transactionManager type="JDBC"/>
+      <!--配置连接池, POOLED:使用连接池(mybatis内置的); UNPOOLED:不使用连接池-->
+      <dataSource type="POOLED">
+        <property name="driver" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+      </dataSource>
+    </environment>
+  </environments>
+
+  <mappers>
+    <package name="com.itheima.mapper"/>
+  </mappers>
+</configuration>

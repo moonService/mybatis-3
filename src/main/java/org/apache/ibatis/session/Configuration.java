@@ -97,6 +97,7 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
  * @author Clinton Begin
+ * 对应sqlMapConfig.xml
  */
 public class Configuration {
 

@@ -218,6 +218,7 @@ public class XMLConfigBuilder extends BaseBuilder {
     }
   }
 
+  //加载配置，外部配置的>配置文件的>property配置
   private void propertiesElement(XNode context) throws Exception {
     if (context != null) {
       Properties defaults = context.getChildrenAsProperties();
