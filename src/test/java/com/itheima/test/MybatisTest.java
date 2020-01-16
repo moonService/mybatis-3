@@ -2,6 +2,7 @@ package com.itheima.test;
 
 import com.itheima.domain.User;
 import com.itheima.mapper.UserMapper;
+import com.itheima.query.QueryVo;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -35,6 +36,7 @@ public class MybatisTest {
   @Test
   public void testFindAllWithFields(){
     List<User> users = mapperProxy.findAllWithFields();
+    //List<User> users = sqlSession.selectList("com.itheima.mapper.UserMapper.findAllWithFields");
     for (User user : users) {
       System.out.println(user);
     }
@@ -48,17 +50,27 @@ public class MybatisTest {
     }
   }
 
+  @Test
+  public void testFindAllWithContruct(){
+    List<User> users = mapperProxy.findAllWithContruct();
+    for (User user : users) {
+      System.out.println(user);
+    }
+  }
+
 
   @Test
   public void testFindAll(){
-    List<User> users = mapperProxy.findAll();
+    QueryVo queryVo = new QueryVo();
+    queryVo.setUsername("六");
+    List<User> users = mapperProxy.findAll(queryVo);
     for (User user : users) {
       System.out.println(user);
     }
   }
 
   @Test
-public void testFindAllUserRole(){
+public void testFindAllUserEx(){
     List<User> users = mapperProxy.findAllUserEx();
     for (User user : users) {
       System.out.println(user);

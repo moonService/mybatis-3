@@ -89,11 +89,17 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
     } catch (Throwable t) {
       throw ExceptionUtil.unwrapThrowable(t);
     }
+    //findAllWithFields
     final MapperMethod mapperMethod = cachedMapperMethod(method);
     return mapperMethod.execute(sqlSession, args);
   }
 
   private MapperMethod cachedMapperMethod(Method method) {
+    /*if(methodCache.containsKey(method)){
+      return methodCache.get(method);
+    }else{
+      methodCache.put(method,new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
+    }*/
     return methodCache.computeIfAbsent(method,
         k -> new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
   }

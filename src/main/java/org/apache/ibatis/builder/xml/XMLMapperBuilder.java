@@ -134,6 +134,9 @@ public class XMLMapperBuilder extends BaseBuilder {
     for (XNode context : list) {
       final XMLStatementBuilder statementParser = new XMLStatementBuilder(configuration, builderAssistant, context, requiredDatabaseId);
       try {
+        //把crud节点保存为一个MappedStatement放到Configuration里面的mappedStatements属性
+        //sql里面包含${}或者where,if...节点是一个动态sql，转化为一个DynamicSqlSource
+        //否则转化为RawSqlSource
         statementParser.parseStatementNode();
       } catch (IncompleteElementException e) {
         configuration.addIncompleteStatement(statementParser);
@@ -188,11 +191,13 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void cacheRefElement(XNode context) {
     if (context != null) {
+      //添加关联
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
       CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
       try {
         cacheRefResolver.resolveCacheRef();
       } catch (IncompleteElementException e) {
+        //如果关联的目标缓存空间尚未开启，把它保存到configuration里面，等到所有的mapper扫描完毕之后再处理
         configuration.addIncompleteCacheRef(cacheRefResolver);
       }
     }
@@ -200,9 +205,11 @@ public class XMLMapperBuilder extends BaseBuilder {
 
   private void cacheElement(XNode context) {
     if (context != null) {
+      //"PERPETUAL"是PerpetualCache.class的别名，是最基本的缓存
       String type = context.getStringAttribute("type", "PERPETUAL");
       Class<? extends Cache> typeClass = typeAliasRegistry.resolveAlias(type);
       String eviction = context.getStringAttribute("eviction", "LRU");
+      //"LRU"是LruCache.class的别名
       Class<? extends Cache> evictionClass = typeAliasRegistry.resolveAlias(eviction);
       Long flushInterval = context.getLongAttribute("flushInterval");
       Integer size = context.getIntAttribute("size");
@@ -253,6 +260,16 @@ public class XMLMapperBuilder extends BaseBuilder {
     return resultMapElement(resultMapNode, Collections.emptyList(), null);
   }
 
+  //场景一：constructor,普通列，继承
+  //  把ResultMap下面的每一个节点都转化为ResultMapping，把整个ResultMap节点转化为一个ResultMap，
+  //  保存到configuration的resultMaps里面Map<namespace.id,ResultMap>
+  //场景二：一对一，一对多
+  //  把ResultMap下面的每一个节点都转化为ResultMapping,把整个ResultMap节点转化为一个ResultMap，
+  //  保存到configuration的resultMaps里面Map<namespace.id,ResultMap>
+  //里面的association和collection都转化为ResultMap,把这个ResultMap的id保存到它在父节点对应的ResultMap里面对应的ResultMapping里面
+  //场景三:鉴别器
+  //  把ResultMap下面的discriminator转化为Discriminator,Discriminator里面有一个resultMapping保存它的属性值，
+  //  它下面的case节点转化为ResultMap，保存一个Map<value,ResultMap的id>
   private ResultMap resultMapElement(XNode resultMapNode, List<ResultMapping> additionalResultMappings, Class<?> enclosingType) throws Exception {
     ErrorContext.instance().activity("processing " + resultMapNode.getValueBasedIdentifier());
     String type = resultMapNode.getStringAttribute("type",

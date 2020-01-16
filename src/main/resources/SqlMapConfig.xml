@@ -28,9 +28,36 @@
     <package name="com.itheima.domain"/>
   </typeAliases>
 
-  <!--配置连接数据库的环境 default:指定使用哪一个环境-->
+  <plugins>
+    <plugin interceptor="com.itheima.plugins.ExamplePlugin"/>
+  </plugins>
+  <!--
+     读default指定的environment节点的信息把信息保存到一个configration->Environment
+  -->
   <environments default="development">
     <environment id="development">
+      <!--配置事务,MyBatis事务用的是jdbc  connection.commit()-->
+      <transactionManager type="JDBC"/>
+      <!--配置连接池, POOLED:使用连接池(mybatis内置的); UNPOOLED:不使用连接池-->
+      <dataSource type="POOLED">
+        <property name="driver" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+      </dataSource>
+    </environment>
+    <environment id="development1">
+      <!--配置事务,MyBatis事务用的是jdbc  connection.commit()-->
+      <transactionManager type="JDBC"/>
+      <!--配置连接池, POOLED:使用连接池(mybatis内置的); UNPOOLED:不使用连接池-->
+      <dataSource type="POOLED">
+        <property name="driver" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+      </dataSource>
+    </environment>
+    <environment id="development2">
       <!--配置事务,MyBatis事务用的是jdbc  connection.commit()-->
       <transactionManager type="JDBC"/>
       <!--配置连接池, POOLED:使用连接池(mybatis内置的); UNPOOLED:不使用连接池-->
@@ -44,6 +71,24 @@
   </environments>
 
   <mappers>
-    <package name="com.itheima.mapper"/>
+    <!--
+      1.xml方式初始化
+          resource或者url
+      2.接口方式
+          class或者package
+    -->
+    <!--
+      xml
+       <mapper resource=""/>
+       <mapper url=""/>
+    -->
+    <!--
+      接口
+       <mapper class=""/>
+       <package name="com.itheima.mapper"/>
+    -->
+    <mapper resource="com/itheima/mapper/OrderMapper.xml"/>
+    <mapper resource="com/itheima/mapper/UserMapper.xml"/>
+    <!--<package name="com.itheima.mapper"/>-->
   </mappers>
 </configuration>

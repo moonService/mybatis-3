@@ -6,11 +6,12 @@ package com.itheima.mapper;
 
 import com.itheima.domain.Teacher;
 import com.itheima.domain.User;
+import com.itheima.query.QueryVo;
 
 import java.util.List;
 
 public interface UserMapper {
-  public List<User> findAll();
+  public List<User> findAll(QueryVo queryVo);
 
   public List<User> findAllWithContruct();
 

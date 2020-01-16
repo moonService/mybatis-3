@@ -3,6 +3,15 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.itheima.mapper.UserMapper">
+  <!--
+    当前的mapper对应的namespace会在二级缓存区域开辟一块缓存空间（内存）
+    <cache/>
+  -->
+  <!--
+    使用namespace指定的缓存空间
+    <cache-ref namespace=""/>
+  -->
+  <cache-ref namespace="order"/>
   <resultMap id="useContruct" type="user">
     <constructor>
       <idArg column="id" javaType="int"/>
@@ -16,7 +25,7 @@
   </resultMap>
 
   <resultMap id="userAllMap" type="user" extends="useField" autoMapping="true">
-    <association property="account" autoMapping="true" javaType="account">
+    <association property="account" autoMapping="true">
       <id column="userid" property="userid"/>
     </association>
     <collection property="roles" ofType="role" autoMapping="true">
@@ -41,9 +50,17 @@
       </case>
     </discriminator>
   </resultMap>
-
+  <!--
+      动态sql：传入的参数可能会改变sql结构
+      静态sql:传入的参数不会改变sql结构
+  -->
   <select id="findAll" resultType="user">
-      select * from user
+      select * from user where username like concat('%',#{username},'%')
+      <!--<where>
+        <if test="username != null and username!= ''">
+            and username like concat('%',#{username},'%')
+        </if>
+      </where>-->
   </select>
 
   <select id="findAllWithContruct" resultMap="useContruct">
