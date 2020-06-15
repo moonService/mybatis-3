@@ -1,5 +1,6 @@
 package com.itheima.test;
 
+import com.itheima.domain.Role;
 import com.itheima.domain.User;
 import com.itheima.mapper.UserMapper;
 import com.itheima.query.QueryVo;
@@ -7,11 +8,14 @@ import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Properties;
 
@@ -34,6 +38,30 @@ public class MybatisTest {
   }
 
   @Test
+  public void inserUser(){
+    List<Role> roles = new ArrayList<>();
+    roles.add(new Role(1,"小A"));
+    roles.add(new Role(1,"小B"));
+    User user = new User();
+    user.setRoles(roles);
+    user.setUsername("张三");
+    user.setAddress("上海");
+    user.setSex("男");
+    user.setBirthday(new Date());
+    mapperProxy.InsertUserRole(user);
+  }
+
+  @Test
+  public void findAll(){
+    List<User> users = mapperProxy.findAll();
+    users.forEach(obj->{
+      System.out.println(obj);
+      System.out.println(obj.getRoles());
+    });
+    System.out.println();
+  }
+
+  /*@Test
   public void testFindAllWithFields(){
     List<User> users = mapperProxy.findAllWithFields();
     //List<User> users = sqlSession.selectList("com.itheima.mapper.UserMapper.findAllWithFields");
@@ -75,9 +103,9 @@ public void testFindAllUserEx(){
     for (User user : users) {
       System.out.println(user);
     }
-  }
+  }*/
 
-  @Test
+  @After
   public void after(){
     sqlSession.commit();
     sqlSession.close();

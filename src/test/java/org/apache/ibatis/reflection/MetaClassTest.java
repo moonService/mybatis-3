@@ -99,7 +99,6 @@ class MetaClassTest {
     assertEquals(List.class, meta.getGetterType("richList"));
     assertEquals(Map.class, meta.getGetterType("richMap"));
     assertEquals(List.class, meta.getGetterType("richList[0]"));
-
     assertEquals(RichType.class, meta.getGetterType("richType"));
     assertEquals(String.class, meta.getGetterType("richType.richField"));
     assertEquals(String.class, meta.getGetterType("richType.richProperty"));

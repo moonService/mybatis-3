@@ -26,6 +26,7 @@ import org.apache.ibatis.domain.blog.Section;
 import org.apache.ibatis.domain.misc.CustomBeanWrapper;
 import org.apache.ibatis.domain.misc.CustomBeanWrapperFactory;
 import org.apache.ibatis.domain.misc.RichType;
+import org.apache.ibatis.domain.misc.User;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -42,10 +43,9 @@ class MetaObjectTest {
 
   @Test
   void shouldGetAndSetNestedField() {
-    RichType rich = new RichType();
-    MetaObject meta = SystemMetaObject.forObject(rich);
-    meta.setValue("richType.richField", "foo");
-    assertEquals("foo", meta.getValue("richType.richField"));
+    User user = new User();
+    MetaObject meta = SystemMetaObject.forObject(user);
+    meta.setValue("role.id", 1);
   }
 
   @Test

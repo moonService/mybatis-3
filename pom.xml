@@ -291,6 +291,19 @@
       <version>5.1.6</version>
       <scope>runtime</scope>
     </dependency>
+
+    <dependency>
+      <groupId>com.alibaba</groupId>
+      <artifactId>fastjson</artifactId>
+      <version>1.2.32</version>
+    </dependency>
+
+    <!--日志包-->
+    <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <version>1.2.12</version>
+    </dependency>
   </dependencies>
 
   <build>

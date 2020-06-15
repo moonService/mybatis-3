@@ -3,6 +3,8 @@
   PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
   "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.itheima.mapper.UserMapper">
+
+  <cache/>
   <!--
     当前的mapper对应的namespace会在二级缓存区域开辟一块缓存空间（内存）
     <cache/>
@@ -11,7 +13,7 @@
     使用namespace指定的缓存空间
     <cache-ref namespace=""/>
   -->
-  <cache-ref namespace="order"/>
+  <!--<cache-ref namespace="order"/>
   <resultMap id="useContruct" type="user">
     <constructor>
       <idArg column="id" javaType="int"/>
@@ -50,17 +52,17 @@
       </case>
     </discriminator>
   </resultMap>
-  <!--
+  &lt;!&ndash;
       动态sql：传入的参数可能会改变sql结构
       静态sql:传入的参数不会改变sql结构
-  -->
+  &ndash;&gt;
   <select id="findAll" resultType="user">
       select * from user where username like concat('%',#{username},'%')
-      <!--<where>
+      &lt;!&ndash;<where>
         <if test="username != null and username!= ''">
             and username like concat('%',#{username},'%')
         </if>
-      </where>-->
+      </where>&ndash;&gt;
   </select>
 
   <select id="findAllWithContruct" resultMap="useContruct">
@@ -87,5 +89,25 @@
       select u.*,tea.`subject` tea_subject,tea.num tea_num,stu.num stu_num from user u
       left join teacher tea on tea.userid = u.id
       left join student stu on stu.userid = u.id
+  </select>-->
+
+  <resultMap id="BaseUserMap" type="user">
+    <id column="id" property="id"/>
+    <result column="username" property="username"/>
+    <result column="birthday" property="birthday"/>
+    <result column="sex" property="sex"/>
+    <result column="address" property="address"/>
+  </resultMap>
+
+  <resultMap id="UserRoleMap2" type="user" extends="BaseUserMap">
+    <result column="roles" property="roles" typeHandler="com.itheima.typehandler.RolesTypeHandler"/>
+  </resultMap>
+
+  <insert id="InsertUserRole">
+    insert into user(username,birthday,sex,address,roles) values(#{username},#{birthday},#{sex},#{address},#{roles,typeHandler=com.itheima.typehandler.RolesTypeHandler})
+  </insert>
+
+  <select id="findAll" resultType="user"><!--resultMap="UserRoleMap2">-->
+     select * from user
   </select>
 </mapper>

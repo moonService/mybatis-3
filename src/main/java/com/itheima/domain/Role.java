@@ -8,6 +8,13 @@ import lombok.Data;
 
 @Data
 public class Role {
-  private String id;	//int
+  private Integer id;	//int
   private String roleName;	//varchar
+
+  public Role(Integer id, String roleName) {
+    this.id = id;
+    this.roleName = roleName;
+  }
+  public Role() {
+  }
 }

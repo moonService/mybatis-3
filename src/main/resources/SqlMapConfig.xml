@@ -7,11 +7,15 @@
     configuration的Properties variabless属性
   -->
   <properties resource="jdbc.properties">
-    <property name="jdbc.driver" value="com.mysql.jdbc.Driver"/>
+    <property name="jdbc.driver" value="com.mysql.jdbc.Drivers"/>
   </properties>
+
+
+
 
   <!--
     configuration里面的属性，最终是通过configration的set方法赋值
+    数据库 user_name 实体类 userName
   -->
   <settings>
     <setting name="mapUnderscoreToCamelCase" value="true"/>
@@ -27,6 +31,11 @@
     <!--<typeAlias type="com.itheima.domain.User" alias="asd"/>-->
     <package name="com.itheima.domain"/>
   </typeAliases>
+
+  <typeHandlers>
+   <!-- <typeHandler handler=""-->
+    <package name="com.itheima.typehandler"/>
+  </typeHandlers>
 
   <plugins>
     <plugin interceptor="com.itheima.plugins.ExamplePlugin"/>
