@@ -25,15 +25,10 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.ReflectPermission;
 import java.lang.reflect.Type;
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 import java.util.Map.Entry;
 
+import org.apache.ibatis.annotations.IgnoreMethod;
 import org.apache.ibatis.reflection.invoker.AmbiguousMethodInvoker;
 import org.apache.ibatis.reflection.invoker.GetFieldInvoker;
 import org.apache.ibatis.reflection.invoker.Invoker;
@@ -64,8 +59,8 @@ public class Reflector {
     type = clazz;
     addDefaultConstructor(clazz);
     addGetMethods(clazz);
-    addSetMethods(clazz);
-    addFields(clazz);
+    Set<String> ingronSetFields = addSetMethods(clazz);
+    addFields(clazz,ingronSetFields);
     readablePropertyNames = getMethods.keySet().toArray(new String[0]);
     writablePropertyNames = setMethods.keySet().toArray(new String[0]);
     for (String propName : readablePropertyNames) {
@@ -133,12 +128,22 @@ public class Reflector {
     getTypes.put(name, typeToClass(returnType));
   }
 
-  private void addSetMethods(Class<?> clazz) {
+  private Set<String> addSetMethods(Class<?> clazz) {
+    Set<String> set = new HashSet<>();
     Map<String, List<Method>> conflictingSetters = new HashMap<>();
     Method[] methods = getClassMethods(clazz);
-    Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 1 && PropertyNamer.isSetter(m.getName()))
+    Arrays.stream(methods).filter(m -> m.getParameterTypes().length == 1 && PropertyNamer.isSetter(m.getName()) && isNotIgnoreMethod(m,set))
       .forEach(m -> addMethodConflict(conflictingSetters, PropertyNamer.methodToProperty(m.getName()), m));
     resolveSetterConflicts(conflictingSetters);
+    return set;
+  }
+
+  private boolean isNotIgnoreMethod(Method m, Set<String> set) {
+    IgnoreMethod annotation = m.getAnnotation(IgnoreMethod.class);
+    if(annotation!=null){
+      set.add(PropertyNamer.methodToProperty(m.getName()));
+    }
+    return annotation==null;
   }
 
   private void addMethodConflict(Map<String, List<Method>> conflictingMethods, String name, Method method) {
@@ -221,7 +226,7 @@ public class Reflector {
     return result;
   }
 
-  private void addFields(Class<?> clazz) {
+  private void addFields(Class<?> clazz, Set<String> ingronSetFields) {
     Field[] fields = clazz.getDeclaredFields();
     for (Field field : fields) {
       if (!setMethods.containsKey(field.getName())) {
@@ -230,7 +235,9 @@ public class Reflector {
         // pr #16 - final static can only be set by the classloader
         int modifiers = field.getModifiers();
         if (!(Modifier.isFinal(modifiers) && Modifier.isStatic(modifiers))) {
-          addSetField(field);
+          if(!ingronSetFields.contains(field.getName())){
+              addSetField(field);
+          }
         }
       }
       if (!getMethods.containsKey(field.getName())) {
@@ -238,7 +245,7 @@ public class Reflector {
       }
     }
     if (clazz.getSuperclass() != null) {
-      addFields(clazz.getSuperclass());
+      addFields(clazz.getSuperclass(), ingronSetFields);
     }
   }
 

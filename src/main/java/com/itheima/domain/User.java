@@ -5,11 +5,12 @@
 package com.itheima.domain;
 
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.Date;
 import java.util.List;
 
-@Data
+@ToString
 public class User {
   private Integer id;  //int
   private String username;  //varchar
@@ -23,6 +24,34 @@ public class User {
   public User(Integer id, String username) {
     this.id = id;
     this.username = username;
+  }
+
+  public Integer getId() {
+    return id;
+  }
+
+  public String getUsername() {
+    return username;
+  }
+
+  public Date getBirthday() {
+    return birthday;
+  }
+
+  public String getSex() {
+    return sex;
+  }
+
+  public String getAddress() {
+    return address;
+  }
+
+  public Account getAccount() {
+    return account;
+  }
+
+  public List<Role> getRoles() {
+    return roles;
   }
 }
 

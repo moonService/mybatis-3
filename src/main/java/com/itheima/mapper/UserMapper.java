@@ -6,14 +6,12 @@ package com.itheima.mapper;
 
 import com.itheima.domain.Teacher;
 import com.itheima.domain.User;
-import com.itheima.query.QueryVo;
-import org.apache.ibatis.annotations.CacheNamespace;
 import org.apache.ibatis.annotations.Select;
 
 import java.util.List;
 
 public interface UserMapper {
- /* public List<User> findAll(QueryVo queryVo);
+  public List<User> findAll();
 
   public List<User> findAllWithContruct();
 
@@ -23,11 +21,8 @@ public interface UserMapper {
 
   public List<User> findAllUserRoleAccount();
 
-  public List<User> findAllUserEx();*/
+  public List<User> findAllUserEx();
 
-  public List<User> findAll();
-
-  public User findUser(Integer id);
-
-  public int InsertUserRole(User user);
+  //查找钱多于10块的用户信息
+  public List<User> findUserByCondition(User user);
 }

@@ -60,7 +60,7 @@ class MetaObjectTest {
   void shouldGetAndSetNestedProperty() {
     RichType rich = new RichType();
     MetaObject meta = SystemMetaObject.forObject(rich);
-    meta.setValue("richType.richProperty", "foo");
+    meta.setValue("richType.richType.richProperty", "foo");
     assertEquals("foo", meta.getValue("richType.richProperty"));
   }
 

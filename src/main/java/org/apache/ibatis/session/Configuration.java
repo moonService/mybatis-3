@@ -27,6 +27,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.function.BiFunction;
 
+import org.apache.ibatis.annotations.IgnoreMethod;
 import org.apache.ibatis.binding.MapperRegistry;
 import org.apache.ibatis.builder.CacheRefResolver;
 import org.apache.ibatis.builder.IncompleteElementException;
@@ -319,6 +320,7 @@ public class Configuration {
     return environment;
   }
 
+  @IgnoreMethod
   public void setEnvironment(Environment environment) {
     this.environment = environment;
   }

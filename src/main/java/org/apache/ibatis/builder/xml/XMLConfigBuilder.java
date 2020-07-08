@@ -17,6 +17,7 @@ package org.apache.ibatis.builder.xml;
 
 import java.io.InputStream;
 import java.io.Reader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Properties;
 import javax.sql.DataSource;
 
@@ -35,8 +36,10 @@ import org.apache.ibatis.parsing.XPathParser;
 import org.apache.ibatis.plugin.Interceptor;
 import org.apache.ibatis.reflection.DefaultReflectorFactory;
 import org.apache.ibatis.reflection.MetaClass;
+import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.ReflectorFactory;
 import org.apache.ibatis.reflection.factory.ObjectFactory;
+import org.apache.ibatis.reflection.invoker.Invoker;
 import org.apache.ibatis.reflection.wrapper.ObjectWrapperFactory;
 import org.apache.ibatis.session.AutoMappingBehavior;
 import org.apache.ibatis.session.AutoMappingUnknownColumnBehavior;
@@ -91,10 +94,11 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   public Configuration parse() {
+    //如果转化过了
     if (parsed) {
       throw new BuilderException("Each XMLConfigBuilder can only be used once.");
     }
-    parsed = true;
+    parsed = true;//转化过了
     parseConfiguration(parser.evalNode("/configuration"));
     return configuration;
   }
@@ -242,7 +246,13 @@ public class XMLConfigBuilder extends BaseBuilder {
   }
 
   private void settingsElement(Properties props) {
-    configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(props.getProperty("autoMappingBehavior", "PARTIAL")));
+    MetaObject metaObject = configuration.newMetaObject(configuration);
+    for (Object key : props.keySet()) {
+      if(metaObject.hasSetter(key.toString())){
+        metaObject.setValue((String) key,transFormVal(props.get(key)));
+      }
+    }
+    /*configuration.setAutoMappingBehavior(AutoMappingBehavior.valueOf(props.getProperty("autoMappingBehavior", "PARTIAL")));
     configuration.setAutoMappingUnknownColumnBehavior(AutoMappingUnknownColumnBehavior.valueOf(props.getProperty("autoMappingUnknownColumnBehavior", "NONE")));
     configuration.setCacheEnabled(booleanValueOf(props.getProperty("cacheEnabled"), true));
     configuration.setProxyFactory((ProxyFactory) createInstance(props.getProperty("proxyFactory")));
@@ -267,7 +277,11 @@ public class XMLConfigBuilder extends BaseBuilder {
     configuration.setUseActualParamName(booleanValueOf(props.getProperty("useActualParamName"), true));
     configuration.setReturnInstanceForEmptyRow(booleanValueOf(props.getProperty("returnInstanceForEmptyRow"), false));
     configuration.setLogPrefix(props.getProperty("logPrefix"));
-    configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));
+    configuration.setConfigurationFactory(resolveClass(props.getProperty("configurationFactory")));*/
+  }
+
+  private Object transFormVal(Object o) {
+    return booleanValueOf((String) o,false);
   }
 
   private void environmentsElement(XNode context) throws Exception {
@@ -364,7 +378,7 @@ public class XMLConfigBuilder extends BaseBuilder {
       for (XNode child : parent.getChildren()) {
         if ("package".equals(child.getName())) {
           String mapperPackage = child.getStringAttribute("name");
-          configuration.addMappers(mapperPackage);
+          configuration.addMappers(mapperPackage);//扫描包所在接的接口并注册mapper
         } else {
           String resource = child.getStringAttribute("resource");
           String url = child.getStringAttribute("url");
@@ -373,15 +387,15 @@ public class XMLConfigBuilder extends BaseBuilder {
             ErrorContext.instance().resource(resource);
             InputStream inputStream = Resources.getResourceAsStream(resource);
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, resource, configuration.getSqlFragments());
-            mapperParser.parse();
+            mapperParser.parse();//通过xml方式注册mapper
           } else if (resource == null && url != null && mapperClass == null) {
             ErrorContext.instance().resource(url);
             InputStream inputStream = Resources.getUrlAsStream(url);
             XMLMapperBuilder mapperParser = new XMLMapperBuilder(inputStream, configuration, url, configuration.getSqlFragments());
-            mapperParser.parse();
+            mapperParser.parse();//通过xml方式注册mapper
           } else if (resource == null && url == null && mapperClass != null) {
             Class<?> mapperInterface = Resources.classForName(mapperClass);
-            configuration.addMapper(mapperInterface);
+            configuration.addMapper(mapperInterface);//扫描接口注册mapper
           } else {
             throw new BuilderException("A mapper element may only specify a url, resource or class, but not more than one.");
           }

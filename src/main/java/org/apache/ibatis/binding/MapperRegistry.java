@@ -94,7 +94,7 @@ public class MapperRegistry {
     resolverUtil.find(new ResolverUtil.IsA(superType), packageName);
     Set<Class<? extends Class<?>>> mapperSet = resolverUtil.getClasses();
     for (Class<?> mapperClass : mapperSet) {
-      addMapper(mapperClass);
+      addMapper(mapperClass);//注册接口
     }
   }
 
